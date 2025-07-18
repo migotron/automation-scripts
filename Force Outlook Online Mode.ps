@@ -1,0 +1,17 @@
+# Set Office version (adjust if needed)
+$officeVersion = "16.0"
+
+# Loop through all loaded user profiles
+Get-ChildItem "HKU:\" | ForEach-Object {
+    $sid = $_.PSChildName
+    $cachedModePath = "Registry::HKU\$sid\Software\Microsoft\Office\$officeVersion\Outlook\Cached Mode"
+
+    # Create the key if it doesn't exist
+    if (-not (Test-Path $cachedModePath)) {
+        New-Item -Path $cachedModePath -Force | Out-Null
+    }
+
+    # Disable Cached Exchange Mode
+    Set-ItemProperty -Path $cachedModePath -Name "Enable" -Value 0 -Force
+    Write-Host "Disabled Cached Mode for SID: $sid"
+}
